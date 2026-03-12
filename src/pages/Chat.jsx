@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Chat.css";
 
 /* API */
@@ -31,6 +32,8 @@ return d.toLocaleDateString();
 };
 
 function Chat(){
+
+const navigate = useNavigate();
 
 const loggedEmail = localStorage.getItem("email");
 
@@ -168,6 +171,60 @@ setReactions(prev=>({
 const filteredMessages=messages.filter(msg=>
 msg.message?.toLowerCase().includes(search.toLowerCase())
 );
+
+/* ADD FRIEND */
+
+const addFriend=async()=>{
+
+if(!friendEmail.trim()){
+alert("Please enter a friend's email");
+return;
+}
+
+try{
+
+await axios.post(`${API}/reg/send-friend/${friendEmail}`,{
+userEmail:loggedEmail
+});
+
+alert("Friend request sent!");
+setFriendEmail("");
+setAddFriendOpen(false);
+
+}catch(err){
+
+alert(err.response?.data?.message || "Error sending friend request");
+
+}
+
+};
+
+/* ACCEPT FRIEND REQUEST */
+
+const acceptFriend=async(friendEmailToAccept)=>{
+
+try{
+
+await axios.post(`${API}/reg/accept-friend/${friendEmailToAccept}`,{
+userEmail:loggedEmail
+});
+
+alert("Friend request accepted!");
+
+/* REFRESH FRIENDS AND PENDING */
+axios.get(`${API}/reg/friends?email=${loggedEmail}`)
+.then(res=>setUsers(res.data));
+
+axios.get(`${API}/reg/pending-friends?email=${loggedEmail}`)
+.then(res=>setPendingRequests(res.data));
+
+}catch(err){
+
+alert(err.response?.data?.message || "Error accepting friend request");
+
+}
+
+};
 
 /* LOGOUT */
 
@@ -465,6 +522,125 @@ onClick={()=>setPreviewImage(null)}
 src={previewImage}
 className="modal-img"
 />
+
+</div>
+
+)}
+
+{/* PROFILE MODAL */}
+
+{profileOpen && (
+
+<div className="modal-overlay" onClick={()=>setProfileOpen(false)}>
+
+<div className="modal-content" onClick={(e)=>e.stopPropagation()}>
+
+<h3>My Profile</h3>
+
+<img
+src={
+profile?.profileImage
+? `${API}/uploads/${profile.profileImage}`
+: defaultAvatar
+}
+className="modal-avatar"
+/>
+
+<p><strong>Name:</strong> {profile?.name}</p>
+<p><strong>Email:</strong> {profile?.email}</p>
+
+<button onClick={()=>{navigate("/profile")}} className="modal-btn">
+Edit Profile
+</button>
+
+<button onClick={logout} className="modal-btn logout-btn">
+Logout
+</button>
+
+</div>
+
+</div>
+
+)}
+
+{/* ADD FRIEND MODAL */}
+
+{addFriendOpen && (
+
+<div className="modal-overlay" onClick={()=>setAddFriendOpen(false)}>
+
+<div className="modal-content" onClick={(e)=>e.stopPropagation()}>
+
+<h3>Add Friend</h3>
+
+<input
+type="email"
+placeholder="Enter friend's email"
+value={friendEmail}
+onChange={(e)=>setFriendEmail(e.target.value)}
+className="modal-input"
+/>
+
+<button onClick={addFriend} className="modal-btn">
+Send Request
+</button>
+
+<button onClick={()=>setAddFriendOpen(false)} className="modal-btn cancel-btn">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+)}
+
+{/* PENDING REQUESTS MODAL */}
+
+{pendingOpen && (
+
+<div className="modal-overlay" onClick={()=>setPendingOpen(false)}>
+
+<div className="modal-content" onClick={(e)=>e.stopPropagation()}>
+
+<h3>Pending Friend Requests</h3>
+
+{pendingRequests.length === 0 ? (
+
+<p>No pending requests</p>
+
+) : (
+
+pendingRequests.map((user,i)=>(
+
+<div key={i} className="pending-request">
+
+<img
+src={
+user?.profileImage
+? `${API}/uploads/${user.profileImage}`
+: defaultAvatar
+}
+className="pending-avatar"
+/>
+
+<span>{user.name} ({user.email})</span>
+
+<button onClick={()=>acceptFriend(user.email)} className="accept-btn">
+Accept
+</button>
+
+</div>
+
+))
+
+)}
+
+<button onClick={()=>setPendingOpen(false)} className="modal-btn cancel-btn">
+Close
+</button>
+
+</div>
 
 </div>
 
