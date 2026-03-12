@@ -199,10 +199,14 @@ if(image){
 formData.append("media",image);
 }
 
-const response = await axios.post(`${API}/messages/send`,formData,{
-headers:{
-"Content-Type":"multipart/form-data"
+// log formData contents for debugging (especially field names/values)
+for (const pair of formData.entries()) {
+  console.log("formData entry:", pair[0], pair[1]);
 }
+const response = await axios.post(`${API}/messages/send`,formData,{
+  headers:{
+    "Content-Type":"multipart/form-data"
+  }
 });
 
 console.log("Message sent:",response.data);
