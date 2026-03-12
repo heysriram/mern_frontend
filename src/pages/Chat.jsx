@@ -195,7 +195,8 @@ formData.append("receiverEmail",selectedUser.email);
 formData.append("message",text);
 
 if(image){
-formData.append("file",image);
+// multer on server expects field name "media"
+formData.append("media",image);
 }
 
 const response = await axios.post(`${API}/messages/send`,formData,{
@@ -208,6 +209,9 @@ console.log("Message sent:",response.data);
 
 setText("");
 setImage(null);
+// clear actual file input element so same file can be reselected later
+const inputElem = document.getElementById("fileInput");
+if(inputElem) inputElem.value = "";
 
 loadMessages(selectedUser);
 
