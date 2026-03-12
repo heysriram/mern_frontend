@@ -1,0 +1,96 @@
+/* Full page background */
+
+.login-container{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#667eea,#764ba2);
+font-family:Arial, Helvetica, sans-serif;
+}
+
+
+/* Login card */
+
+.login-box{
+background:white;
+padding:40px;
+border-radius:10px;
+width:350px;
+box-shadow:0 8px 25px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+
+/* Title */
+
+.login-title{
+margin-bottom:25px;
+color:#333;
+}
+
+
+/* Input fields */
+
+.login-input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:6px;
+outline:none;
+font-size:14px;
+transition:0.2s;
+}
+
+.login-input:focus{
+border-color:#667eea;
+}
+
+
+/* Button */
+
+.login-btn{
+width:100%;
+padding:12px;
+background:#667eea;
+border:none;
+border-radius:6px;
+color:white;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.login-btn:hover{
+background:#5a67d8;
+}
+
+
+/* Register link */
+
+.register-link{
+margin-top:15px;
+font-size:14px;
+}
+
+.register-link span{
+color:#667eea;
+cursor:pointer;
+font-weight:bold;
+}
+.signup-link{
+margin-top:15px;
+font-size:14px;
+}
+
+.signup-link span{
+color:#667eea;
+cursor:pointer;
+font-weight:bold;
+margin-left:5px;
+}
+
+.signup-link span:hover{
+text-decoration:underline;
+}

@@ -1,0 +1,369 @@
+/* MAIN CONTAINER */
+
+.chat-container{
+display:flex;
+height:100vh;
+font-family:Arial, Helvetica, sans-serif;
+background:#f1f5f9;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:270px;
+background:#1e293b;
+color:white;
+padding:15px;
+display:flex;
+flex-direction:column;
+overflow-y:auto;
+position:relative;
+}
+
+/* PROFILE SECTION */
+
+.profile-section{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:15px;
+}
+
+/* PROFILE ICON */
+
+.profile-logo{
+position:relative;
+cursor:pointer;
+}
+
+.profile-logo-img{
+width:45px;
+height:45px;
+border-radius:50%;
+object-fit:cover;
+}
+
+/* PENDING BADGE */
+
+.pending-badge{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:white;
+font-size:12px;
+padding:2px 6px;
+border-radius:50%;
+}
+
+/* BUTTONS */
+
+.add-friend-btn,
+.pending-btn{
+background:#3b82f6;
+border:none;
+color:white;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:16px;
+}
+
+.add-friend-btn:hover,
+.pending-btn:hover{
+background:#2563eb;
+}
+
+/* PROFILE POPUP */
+
+.profile-box{
+position:absolute;
+top:70px;
+left:15px;
+background:white;
+color:black;
+padding:15px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.3);
+width:200px;
+text-align:center;
+z-index:100;
+}
+
+.profile-img{
+width:70px;
+height:70px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+.profile-btn,
+.logout-btn{
+width:100%;
+margin-top:8px;
+padding:6px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.profile-btn{
+background:#3b82f6;
+color:white;
+}
+
+.logout-btn{
+background:#ef4444;
+color:white;
+}
+
+/* TITLE */
+
+.title{
+font-size:18px;
+margin-bottom:10px;
+}
+
+/* USER LIST */
+
+.user{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+border-radius:6px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.user:hover{
+background:#334155;
+}
+
+.user-avatar{
+width:35px;
+height:35px;
+border-radius:50%;
+object-fit:cover;
+}
+
+/* ADD FRIEND PANEL */
+
+.add-friend{
+display:flex;
+gap:6px;
+margin-top:10px;
+}
+
+.friend-input{
+flex:1;
+padding:6px;
+border-radius:6px;
+border:none;
+}
+
+.friend-btn{
+background:#22c55e;
+border:none;
+padding:6px 10px;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* PENDING REQUESTS PANEL */
+
+.pending-list{
+background:white;
+color:black;
+margin-top:10px;
+padding:10px;
+border-radius:8px;
+}
+
+.pending-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:6px;
+}
+
+.accept-btn{
+background:#22c55e;
+border:none;
+color:white;
+padding:4px 8px;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* CHAT AREA */
+
+.chat-area{
+flex:1;
+display:flex;
+flex-direction:column;
+background:#e2e8f0;
+}
+
+/* CHAT HEADER */
+
+.chat-header{
+background:white;
+padding:15px;
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:bold;
+border-bottom:1px solid #ddd;
+}
+
+.friend-logo-img{
+width:40px;
+height:40px;
+border-radius:50%;
+object-fit:cover;
+}
+
+/* MESSAGES */
+
+.messages{
+flex:1;
+padding:15px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+/* MESSAGE BUBBLES */
+
+.my-message{
+align-self:flex-end;
+background:#3b82f6;
+color:white;
+padding:10px;
+border-radius:12px 12px 0 12px;
+max-width:60%;
+word-wrap:break-word;
+}
+
+.other-message{
+align-self:flex-start;
+background:white;
+padding:10px;
+border-radius:12px 12px 12px 0;
+max-width:60%;
+word-wrap:break-word;
+}
+
+/* MESSAGE CONTENT */
+
+.msg-content{
+display:flex;
+flex-direction:column;
+}
+
+/* MESSAGE TIME */
+
+.msg-time{
+font-size:11px;
+opacity:0.6;
+margin-top:3px;
+text-align:right;
+}
+
+.other-message .msg-time{
+text-align:left;
+}
+
+/* IMAGE MESSAGE */
+
+.chat-image{
+max-width:200px;
+margin-top:5px;
+border-radius:8px;
+}
+
+/* INPUT AREA */
+
+.input-area{
+display:flex;
+align-items:center;
+gap:8px;
+padding:10px;
+background:white;
+border-top:1px solid #ddd;
+}
+
+/* CHAT INPUT */
+
+.chat-input{
+flex:1;
+padding:10px;
+border-radius:20px;
+border:1px solid #ccc;
+outline:none;
+}
+
+/* FILE BUTTON */
+
+.file-btn{
+background:#6366f1;
+border:none;
+color:white;
+padding:8px 12px;
+border-radius:50%;
+cursor:pointer;
+}
+
+/* SEND BUTTON */
+
+.send-btn{
+background:#22c55e;
+border:none;
+color:white;
+padding:8px 16px;
+border-radius:20px;
+cursor:pointer;
+font-weight:bold;
+}
+
+/* IMAGE PREVIEW */
+
+.preview{
+display:flex;
+align-items:center;
+gap:5px;
+background:#f8fafc;
+padding:5px;
+border-radius:6px;
+}
+
+.preview-img{
+height:40px;
+border-radius:5px;
+}
+
+.remove-preview{
+background:red;
+border:none;
+color:white;
+padding:2px 6px;
+border-radius:50%;
+cursor:pointer;
+}
+
+/* NO CHAT */
+
+.no-chat{
+display:flex;
+align-items:center;
+justify-content:center;
+height:100%;
+font-size:18px;
+color:#555;
+text-align:center;
+}
