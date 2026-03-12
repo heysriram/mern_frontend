@@ -56,51 +56,38 @@ setText(prev=>prev+emoji.emoji);
 /* FILE SELECT */
 
 const handleFileChange=(e)=>{
-
 const file=e.target.files[0];
-
 if(file) setImage(file);
-
 };
 
 /* ENTER KEY SEND */
 
 const handleKeyDown=(e)=>{
-
 if(e.key==="Enter" && !e.shiftKey){
-
 e.preventDefault();
 sendMessage();
-
 }
-
 };
 
 /* PROFILE */
 
 useEffect(()=>{
-
 axios.get(`${API}/reg/profile/${loggedEmail}`)
 .then(res=>setProfile(res.data));
-
 },[loggedEmail]);
 
 /* FRIENDS */
 
 useEffect(()=>{
-
 axios.get(`${API}/reg/friends?email=${loggedEmail}`)
 .then(res=>setUsers(res.data));
-
 },[loggedEmail]);
 
 /* PENDING */
 
 useEffect(()=>{
-
 axios.get(`${API}/reg/pending-friends?email=${loggedEmail}`)
 .then(res=>setPendingRequests(res.data));
-
 },[loggedEmail]);
 
 /* LOAD CHAT */
@@ -114,6 +101,24 @@ axios
 .then(res=>setMessages(res.data));
 
 };
+
+/* AUTO REFRESH CHAT (NEW) */
+
+useEffect(()=>{
+
+if(!selectedUser) return;
+
+const interval = setInterval(()=>{
+
+axios
+.get(`${API}/messages/chat/${loggedEmail}/${selectedUser.email}`)
+.then(res=>setMessages(res.data));
+
+},2000);
+
+return ()=>clearInterval(interval);
+
+},[selectedUser,loggedEmail]);
 
 /* SEND MESSAGE */
 
@@ -143,12 +148,10 @@ loadMessages(selectedUser);
 /* REACTION */
 
 const addReaction=(index,emoji)=>{
-
 setReactions(prev=>({
 ...prev,
 [index]:emoji
 }));
-
 };
 
 /* FILTER SEARCH */
@@ -160,10 +163,8 @@ msg.message?.toLowerCase().includes(search.toLowerCase())
 /* LOGOUT */
 
 const logout=()=>{
-
 localStorage.removeItem("email");
 window.location.href="/";
-
 };
 
 return(
@@ -211,7 +212,6 @@ onClick={()=>setPendingOpen(!pendingOpen)}
 <h2 className="title">Users</h2>
 
 {users.map((user)=>(
-
 <div
 key={user.email}
 className="user"
@@ -230,7 +230,6 @@ className="user-avatar"
 {user.name}
 
 </div>
-
 ))}
 
 </div>
@@ -283,13 +282,11 @@ className={`message-container ${isMe ? "my-message" : "other-message"}`}
 {msg.message}
 
 {msg.media &&(
-
 <img
 src={`${API}/uploads/${msg.media}`}
 className="chat-image"
 onClick={()=>setPreviewImage(`${API}/uploads/${msg.media}`)}
 />
-
 )}
 
 </div>
@@ -328,13 +325,9 @@ onClick={()=>setShowEmoji(!showEmoji)}
 </button>
 
 {showEmoji &&(
-
 <div className="emoji-box">
-
 <EmojiPicker onEmojiClick={addEmoji}/>
-
 </div>
-
 )}
 
 <input
@@ -361,23 +354,18 @@ onClick={()=>document.getElementById("fileInput").click()}
 </button>
 
 {image &&(
-
 <div className="preview">
-
 <img
 src={URL.createObjectURL(image)}
 className="preview-img"
 />
-
 <button
 className="remove-preview"
 onClick={()=>setImage(null)}
 >
 x
 </button>
-
 </div>
-
 )}
 
 <button
@@ -392,29 +380,23 @@ Send
 </>
 
 ):( 
-
 <div className="no-chat">
 Select a user to start chatting
 </div>
-
 )}
 
 </div>
 
 {previewImage &&(
-
 <div
 className="image-modal"
 onClick={()=>setPreviewImage(null)}
 >
-
 <img
 src={previewImage}
 className="modal-img"
 />
-
 </div>
-
 )}
 
 </div>
