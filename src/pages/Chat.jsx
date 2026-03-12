@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import EmojiPicker from "emoji-picker-react";
 import "../styles/Chat.css";
 
-/* API URLs */
+/* API */
 
-const LOCAL_API = "http://localhost:5000";
-const LIVE_API = "https://mern-backend-ariu.onrender.com";
-
-/* SWITCH API - Always use LIVE_API for development testing */
-
-const API = LIVE_API;
+const API = "https://mern-backend-ariu.onrender.com";
 
 /* FORMAT TIME */
 
@@ -22,6 +18,15 @@ return d.toLocaleTimeString([],{
 hour:"2-digit",
 minute:"2-digit"
 });
+};
+
+/* FORMAT DATE */
+
+const formatDate=(date)=>{
+
+const d=new Date(date);
+
+return d.toLocaleDateString();
 
 };
 
@@ -29,23 +34,36 @@ function Chat(){
 
 const loggedEmail = localStorage.getItem("email");
 
-const [users,setUsers] = useState([]);
-const [selectedUser,setSelectedUser] = useState(null);
-const [messages,setMessages] = useState([]);
-const [text,setText] = useState("");
-const [profile,setProfile] = useState(null);
+const [users,setUsers]=useState([]);
+const [selectedUser,setSelectedUser]=useState(null);
+const [messages,setMessages]=useState([]);
+const [text,setText]=useState("");
+const [profile,setProfile]=useState(null);
 
-const [image,setImage] = useState(null);
+const [image,setImage]=useState(null);
 
-const [profileOpen,setProfileOpen] = useState(false);
-const [addFriendOpen,setAddFriendOpen] = useState(false);
-const [pendingOpen,setPendingOpen] = useState(false);
+const [profileOpen,setProfileOpen]=useState(false);
+const [addFriendOpen,setAddFriendOpen]=useState(false);
+const [pendingOpen,setPendingOpen]=useState(false);
 
-const [friendEmail,setFriendEmail] = useState("");
-const [pendingRequests,setPendingRequests] = useState([]);
+const [friendEmail,setFriendEmail]=useState("");
+const [pendingRequests,setPendingRequests]=useState([]);
+
+const [search,setSearch]=useState("");
+const [previewImage,setPreviewImage]=useState(null);
+
+const [showEmoji,setShowEmoji]=useState(false);
+
+const [reactions,setReactions]=useState({});
 
 const defaultAvatar =
 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+/* EMOJI */
+
+const addEmoji=(emoji)=>{
+setText(prev=>prev+emoji.emoji);
+};
 
 /* FILE SELECT */
 
@@ -53,9 +71,7 @@ const handleFileChange=(e)=>{
 
 const file=e.target.files[0];
 
-if(file){
-setImage(file);
-}
+if(file) setImage(file);
 
 };
 
@@ -72,48 +88,30 @@ sendMessage();
 
 };
 
-/* LOAD PROFILE */
+/* PROFILE */
 
 useEffect(()=>{
 
 axios.get(`${API}/reg/profile/${loggedEmail}`)
-.then(res=>{
-console.log("Profile loaded:",res.data);
-setProfile(res.data);
-})
-.catch(err=>{
-console.error("Profile load error:",err.response?.data || err.message);
-});
+.then(res=>setProfile(res.data));
 
 },[loggedEmail]);
 
-/* LOAD FRIENDS */
+/* FRIENDS */
 
 useEffect(()=>{
 
 axios.get(`${API}/reg/friends?email=${loggedEmail}`)
-.then(res=>{
-console.log("Friends loaded:",res.data);
-setUsers(res.data);
-})
-.catch(err=>{
-console.error("Friends load error:",err.response?.data || err.message);
-});
+.then(res=>setUsers(res.data));
 
 },[loggedEmail]);
 
-/* LOAD PENDING REQUESTS */
+/* PENDING */
 
 useEffect(()=>{
 
 axios.get(`${API}/reg/pending-friends?email=${loggedEmail}`)
-.then(res=>{
-console.log("Pending requests loaded:",res.data);
-setPendingRequests(res.data);
-})
-.catch(err=>{
-console.error("Pending requests load error:",err.response?.data || err.message);
-});
+.then(res=>setPendingRequests(res.data));
 
 },[loggedEmail]);
 
@@ -125,58 +123,7 @@ setSelectedUser(user);
 
 axios
 .get(`${API}/messages/chat/${loggedEmail}/${user.email}`)
-.then(res=>{
-console.log("Messages loaded:",res.data);
-setMessages(res.data);
-})
-.catch(err=>{
-console.error("Load messages error:",err.response?.data || err.message);
-console.log("API URL used:",`${API}/messages/chat/${loggedEmail}/${user.email}`);
-});
-
-};
-
-/* SEND FRIEND REQUEST */
-
-const sendFriendRequest=async()=>{
-
-if(!friendEmail.trim()) return alert("Enter friend's email");
-
-try{
-
-await axios.post(`${API}/reg/send-friend/${friendEmail}`,{
-userEmail:loggedEmail
-});
-
-alert("Friend request sent");
-
-setFriendEmail("");
-
-}catch(err){
-
-alert("Error sending request");
-
-}
-
-};
-
-/* ACCEPT FRIEND REQUEST */
-
-const acceptFriendRequest=async(email)=>{
-
-try{
-
-await axios.post(`${API}/reg/accept-friend/${email}`,{
-userEmail:loggedEmail
-});
-
-alert("Friend request accepted");
-
-}catch(err){
-
-alert("Error accepting request");
-
-}
+.then(res=>setMessages(res.data));
 
 };
 
@@ -186,8 +133,6 @@ const sendMessage=async()=>{
 
 if((!text.trim() && !image) || !selectedUser) return;
 
-try{
-
 const formData=new FormData();
 
 formData.append("senderEmail",loggedEmail);
@@ -195,48 +140,34 @@ formData.append("receiverEmail",selectedUser.email);
 formData.append("message",text);
 
 if(image){
-// multer on server expects field name "media"
 formData.append("media",image);
 }
 
-// log formData contents for debugging (especially field names/values)
-for (const pair of formData.entries()) {
-  console.log("formData entry:", pair[0], pair[1]);
-}
-const response = await axios.post(`${API}/messages/send`,formData,{
-  headers:{
-    "Content-Type":"multipart/form-data"
-  }
-});
-
-console.log("Message sent:",response.data);
+await axios.post(`${API}/messages/send`,formData);
 
 setText("");
 setImage(null);
-// clear actual file input element so same file can be reselected later
-const inputElem = document.getElementById("fileInput");
-if(inputElem) inputElem.value = "";
 
 loadMessages(selectedUser);
 
-}catch(err){
+};
 
-// log full response object for easier debugging
-console.error("Message send error", err);
-if(err.response){
-  console.error("response data", err.response.data);
-  console.error("response status", err.response.status);
-}
-alert("Error sending message: " +
-  (err.response?.data?.message ||
-   err.response?.data?.error ||
-   JSON.stringify(err.response?.data) ||
-   err.message)
-);
+/* REACTION */
 
-}
+const addReaction=(index,emoji)=>{
+
+setReactions(prev=>({
+...prev,
+[index]:emoji
+}));
 
 };
+
+/* FILTER SEARCH */
+
+const filteredMessages=messages.filter(msg=>
+msg.message?.toLowerCase().includes(search.toLowerCase())
+);
 
 /* LOGOUT */
 
@@ -255,8 +186,6 @@ return(
 
 <div className="sidebar">
 
-{/* PROFILE SECTION */}
-
 <div className="profile-section">
 
 <div
@@ -272,14 +201,6 @@ profile?.profileImage
 }
 className="profile-logo-img"
 />
-
-{pendingRequests.length>0 &&(
-
-<span className="pending-badge">
-{pendingRequests.length}
-</span>
-
-)}
 
 </div>
 
@@ -299,45 +220,7 @@ onClick={()=>setPendingOpen(!pendingOpen)}
 
 </div>
 
-{/* PROFILE POPUP */}
-
-{profileOpen && profile &&(
-
-<div className="profile-box">
-
-<img
-src={
-profile?.profileImage
-? `${API}/uploads/${profile.profileImage}`
-: defaultAvatar
-}
-className="profile-img"
-/>
-
-<h3>{profile.name}</h3>
-<p>{profile.email}</p>
-
-<button
-className="profile-btn"
-onClick={()=>window.location.href="/profile"}
->
-Edit Profile
-</button>
-
-<button
-className="logout-btn"
-onClick={logout}
->
-Logout
-</button>
-
-</div>
-
-)}
-
 <h2 className="title">Users</h2>
-
-{/* USERS */}
 
 {users.map((user,i)=>(
 
@@ -361,66 +244,6 @@ className="user-avatar"
 </div>
 
 ))}
-
-{/* ADD FRIEND */}
-
-{addFriendOpen &&(
-
-<div className="add-friend">
-
-<input
-type="email"
-placeholder="Friend email"
-value={friendEmail}
-onChange={(e)=>setFriendEmail(e.target.value)}
-className="friend-input"
-/>
-
-<button
-className="friend-btn"
-onClick={sendFriendRequest}
->
-Add
-</button>
-
-</div>
-
-)}
-
-{/* PENDING FRIEND REQUESTS */}
-
-{pendingOpen &&(
-
-<div className="pending-list">
-
-{pendingRequests.length===0 ?(
-
-<p>No requests</p>
-
-):( 
-
-pendingRequests.map((req,i)=>(
-
-<div key={i} className="pending-item">
-
-<span>{req.email}</span>
-
-<button
-className="accept-btn"
-onClick={()=>acceptFriendRequest(req.email)}
->
-Accept
-</button>
-
-</div>
-
-))
-
-)}
-
-</div>
-
-)}
 
 </div>
 
@@ -447,9 +270,18 @@ Chat with {selectedUser.name}
 
 </div>
 
+{/* SEARCH */}
+
+<input
+className="search-input"
+placeholder="Search messages..."
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+/>
+
 <div className="messages">
 
-{messages.map((msg,i)=>{
+{filteredMessages.map((msg,i)=>{
 
 const isMe=msg.senderEmail===loggedEmail;
 
@@ -469,6 +301,7 @@ className={isMe?"my-message":"other-message"}
 <img
 src={`${API}/uploads/${msg.media}`}
 className="chat-image"
+onClick={()=>setPreviewImage(`${API}/uploads/${msg.media}`)}
 />
 
 )}
@@ -476,10 +309,55 @@ className="chat-image"
 </div>
 
 <div className="msg-time">
-
 {formatTime(msg.createdAt)}
+</div>
+
+{/* REACTIONS */}
+
+<div
+key={i}
+className={`message-container ${isMe ? "my-message" : "other-message"}`}
+>
+
+<div className="msg-content">
+
+{msg.message}
+
+{msg.media && (
+<img
+src={`${API}/uploads/${msg.media}`}
+className="chat-image"
+onClick={()=>setPreviewImage(`${API}/uploads/${msg.media}`)}
+/>
+)}
 
 </div>
+
+{/* REACTIONS */}
+
+<div className="reaction-box">
+
+<span onClick={()=>addReaction(i,"👍")}>👍</span>
+<span onClick={()=>addReaction(i,"❤️")}>❤️</span>
+<span onClick={()=>addReaction(i,"😂")}>😂</span>
+
+</div>
+
+{reactions[i] && (
+<span className="reaction">{reactions[i]}</span>
+)}
+
+<div className="msg-time">
+{formatTime(msg.createdAt)}
+</div>
+
+</div>
+
+{reactions[i] && (
+<span className="reaction">
+{reactions[i]}
+</span>
+)}
 
 </div>
 
@@ -489,7 +367,26 @@ className="chat-image"
 
 </div>
 
+{/* INPUT */}
+
 <div className="input-area">
+
+<button
+className="emoji-btn"
+onClick={()=>setShowEmoji(!showEmoji)}
+>
+😊
+</button>
+
+{showEmoji &&(
+
+<div className="emoji-box">
+
+<EmojiPicker onEmojiClick={addEmoji}/>
+
+</div>
+
+)}
 
 <input
 className="chat-input"
@@ -554,6 +451,24 @@ Select a user to start chatting
 )}
 
 </div>
+
+{/* IMAGE MODAL */}
+
+{previewImage &&(
+
+<div
+className="image-modal"
+onClick={()=>setPreviewImage(null)}
+>
+
+<img
+src={previewImage}
+className="modal-img"
+/>
+
+</div>
+
+)}
 
 </div>
 
