@@ -217,8 +217,18 @@ loadMessages(selectedUser);
 
 }catch(err){
 
-console.error("Message send error:",err.response?.data || err.message);
-alert("Error sending message: " + (err.response?.data?.message || err.message));
+// log full response object for easier debugging
+console.error("Message send error", err);
+if(err.response){
+  console.error("response data", err.response.data);
+  console.error("response status", err.response.status);
+}
+alert("Error sending message: " +
+  (err.response?.data?.message ||
+   err.response?.data?.error ||
+   JSON.stringify(err.response?.data) ||
+   err.message)
+);
 
 }
 
